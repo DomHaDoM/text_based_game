@@ -8,11 +8,12 @@ from flet import (
     , IconButton
     , SegmentedButton, Segment
     , MainAxisAlignment
-    , AppBar
+    , CupertinoAppBar
     , icons
 )
 
 from assets.game import Game
+from assets.chest import Chest
 
 def main(page: Page):
 
@@ -30,7 +31,10 @@ def main(page: Page):
 
     def handle_change(e) -> None:
         nonlocal game_difficulty
-        sel = int(list(difficulty_selector.selected)[0])
+        try:
+            sel = int(list(difficulty_selector.selected)[0])
+        except:
+            sel = None
         if sel is not None:
             game_btn.disabled = False
             if sel == 1:
@@ -76,6 +80,16 @@ def main(page: Page):
                               , disabled=True
                               , on_click=show_game_settings
                               )
+    opened_chests: int = 0
+    result = Text("")
+
+    def open_chest(e):
+        nonlocal opened_chests
+        a = Chest("sword")
+        opened_chests += 1
+        result.value = f"{a.item}\nTotal opened chests: {opened_chests}"
+        page.update()
+
 
     game_page = Row(
         [
@@ -84,6 +98,8 @@ def main(page: Page):
                     Text("Game Page")
                     , difficulty_selector
                     , game_btn
+                    , ElevatedButton("Open Chest", on_click=open_chest)
+                    , result
                 ]
             )
         ], alignment=MainAxisAlignment.CENTER
@@ -105,16 +121,35 @@ def main(page: Page):
         ], alignment=MainAxisAlignment.SPACE_AROUND
     )
 
+    # Function to create a starting page
     def open_starting_page(e) -> None:
         page.clean()
         page.add(starting_page)
         page.update()
 
-    page.appbar = AppBar(
+    # function to change theme and icon depending on current theme
+    def change_theme(e):
+        if page.theme_mode == "dark":
+            theme_button.icon = icons.SUNNY
+            page.theme_mode = "light"
+        else:
+            theme_button.icon = icons.NIGHTLIGHT_ROUND
+            page.theme_mode = "dark"
+        page.update()
+
+    # Button to change page theme mode
+    theme_button = IconButton(
+        icon=icons.NIGHTLIGHT_ROUND
+        , on_click=change_theme
+    )
+
+    # Appbar for all pages
+    page.appbar = CupertinoAppBar(
         leading=IconButton(
             icon=icons.HOME_FILLED
             , on_click=open_starting_page
         )
+        , trailing=theme_button
     )
     
     page.add(
