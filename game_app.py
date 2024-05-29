@@ -1,3 +1,4 @@
+from sys import version
 from flet import (
     app
     , Page
@@ -12,7 +13,7 @@ from flet import (
     , icons
 )
 
-from assets.game import Game
+from assets.game import Game, version as game_version
 from assets.chest import Chest
 
 def main(page: Page):
@@ -20,6 +21,7 @@ def main(page: Page):
     page.title = "Text Based Game"
     page.theme_mode = "dark"
     page.vertical_alignment = MainAxisAlignment.CENTER
+    app_version: str = "0.1"
 
     game_difficulty: str = None
 
@@ -154,7 +156,11 @@ def main(page: Page):
         , trailing=theme_button
     )
     
+
+    version = Row([Text(f"App Version: v{app_version}\nGame Version: v{game_version}")], alignment=MainAxisAlignment.CENTER)
+
     page.add(
         starting_page
+        , version
         )
 app(main)
