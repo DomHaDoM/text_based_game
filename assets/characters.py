@@ -42,3 +42,6 @@ class Boss(Enemy):
     def __init__(self, max_health: int, damage: int):
         super().__init__(max_health=max_health, damage=damage)
         self.enemy_class = "boss"
+
+    def special_ability(self) -> NotImplementedError:
+        raise NotImplementedError("Create an ability for boss to swap theme mode of the page")

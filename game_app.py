@@ -23,10 +23,11 @@ def main(page: Page):
 
     game_difficulty: str = None
 
+    game_settings = Text("")
 
     def show_game_settings(e) -> None:
         game = Game(game_difficulty)
-        page.add(Row([Text(game.current_settings)] , alignment=MainAxisAlignment.CENTER))
+        game_settings.value = game.current_settings
         page.update()
 
     def handle_change(e) -> None:
@@ -100,6 +101,7 @@ def main(page: Page):
                     , game_btn
                     , ElevatedButton("Open Chest", on_click=open_chest)
                     , result
+                    , game_settings
                 ]
             )
         ], alignment=MainAxisAlignment.CENTER
