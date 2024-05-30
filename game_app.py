@@ -84,15 +84,23 @@ def main(page: Page):
                               , on_click=show_game_settings
                               )
     opened_chests: int = 0
+    total_chests: int = 10
     result = Text("")
 
     def open_chest(e):
-        nonlocal opened_chests
-        a = Chest("sword")
-        opened_chests += 1
-        result.value = f"{a.item}\nTotal opened chests: {opened_chests}"
+        nonlocal opened_chests, total_chests
+        if total_chests > 0:
+            chest_btn.disabled = False
+            opened_chests += 1
+            total_chests -= 1
+            a = Chest("sword")
+            result.value = f"{a.item}\nTotal opened chests: {opened_chests}"
+        else:
+            chest_btn.disabled = True
+            result.value = f"No chests avaliable"
         page.update()
 
+    chest_btn = ElevatedButton("Open Chest", on_click=open_chest)
 
     game_page = Row(
         [
@@ -101,7 +109,7 @@ def main(page: Page):
                     Text("Game Page")
                     , difficulty_selector
                     , game_btn
-                    , ElevatedButton("Open Chest", on_click=open_chest)
+                    , chest_btn
                     , result
                     , game_settings
                 ]
