@@ -21,7 +21,7 @@ def main(page: Page):
     page.title = "Text Based Game"
     page.theme_mode = "dark"
     page.vertical_alignment = MainAxisAlignment.CENTER
-    app_version: str = "0.1"
+    app_version: str = "0.1.1"
 
     game_difficulty: str = None
 
