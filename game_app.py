@@ -1,4 +1,3 @@
-from sys import version
 from flet import (
     app
     , Page
