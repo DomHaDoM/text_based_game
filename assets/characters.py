@@ -1,4 +1,6 @@
+from typing import Literal
 from assets.weapons import Weapon, fists
+from assets.constants import MAP
 
 class Character:
     max_health: int = 40
@@ -17,6 +19,9 @@ class Character:
 
     def deal_damage(self, opponent) -> None:
         opponent.get_damage(self.damage)
+
+    def move(self, direction: Literal["forward", "left", "right"]) -> NotImplementedError:
+        raise NotImplementedError("Add ability to move between rooms")
 
 
 class Hero(Character):
