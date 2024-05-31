@@ -15,20 +15,79 @@ from flet import (
 from assets.game import Game, version as game_version
 from assets.chest import Chest
 
+from random import choice
+
 def main(page: Page):
 
+    # App settings
     page.title = "Text Based Game"
     page.theme_mode = "dark"
     page.vertical_alignment = MainAxisAlignment.CENTER
     app_version: str = "0.1.1"
 
+    #variables
     game_difficulty: str = None
-
     game_settings = Text("")
+    opened_chests: int = 0
+    total_chests: int = 5
+    result = Text("")
+    game: Game = None
+
+    try:
+        player_hp: str = f"{game.player.current_health}/{game.player.max_health}"
+        player_weapon: str = f"Weapon: {game.player.weapon.name}. Damage: {game.player.damage}"
+        current_room: str = f"{game.player.current_room}"
+    except:
+        player_hp: str = f"Fail"
+        player_weapon: str = f"Fail"
+        current_room: str = f"Fail" 
+
+    def add_chests(e):
+        nonlocal total_chests
+        total_chests += 1
+
+    def open_chest_main(e):
+        nonlocal total_chests, opened_chests
+        if total_chests > 0:
+            open_chest_btn.disabled = False
+            # chest = Chest(choice["sword", "bow", "fist"])
+            opened_chests += 1
+            total_chests += 1
+        else:
+            open_chest_btn.disabled = True
+        page.update()
+            
+
+    open_chest_btn = ElevatedButton(
+        f"Open chest. Remaining: {total_chests}"
+        , on_click=open_chest_main
+        )
+
+    # remove later
+    add_chest_btn = IconButton(
+        icon=icons.ADD
+        , on_click=add_chests)
+
+    game_page = Row([
+        Column([
+            player_hp
+            , player_weapon
+            , current_room
+        ])
+        , Column([
+            add_chest_btn
+            , open_chest_btn
+            , Text(f"Avaliable chests: {total_chests}")
+            , Text(f"Opened chests: {opened_chests}")
+        ])
+    ], alignment=MainAxisAlignment.SPACE_EVENLY)
 
     def show_game_settings(e) -> None:
+        nonlocal game
         game = Game(game_difficulty)
-        game_settings.value = game.current_settings
+        # game_settings.value = game.current_settings
+        page.clean()
+        page.add(game_page)
         page.update()
 
     def handle_change(e) -> None:
@@ -82,9 +141,6 @@ def main(page: Page):
                               , disabled=True
                               , on_click=show_game_settings
                               )
-    opened_chests: int = 0
-    total_chests: int = 10
-    result = Text("")
 
     def open_chest(e):
         nonlocal opened_chests, total_chests
@@ -101,7 +157,7 @@ def main(page: Page):
 
     chest_btn = ElevatedButton("Open Chest", on_click=open_chest)
 
-    game_page = Row(
+    game_setup = Row(
         [
             Column(
                 [
@@ -118,7 +174,7 @@ def main(page: Page):
 
     def open_game_page(e):
         page.clean()
-        page.add(game_page)
+        page.add(game_setup)
         page.update()
 
     starting_page = Row(
