@@ -19,7 +19,7 @@ class Character:
         
         Updates current hp for the character
         """
-        self.current_health = min(self.current_health+heal_amount, self.max_health)
+        self.current_health = min(self.current_health + heal_amount, self.max_health) # check to avoid hp going over the max barrier
 
     def get_damage(self, damage: int) -> None:
         """ function created to get damage from characters
@@ -29,7 +29,7 @@ class Character:
         
         Updates current hp for the character
         """
-        self.current_health = max(self.current_health - damage, 0)
+        self.current_health = max(self.current_health - damage, 0)  # check to avoid hp going lower than 0
 
     def deal_damage(self, opponent) -> None:
         """ function created to deal damage to other entities
@@ -39,6 +39,13 @@ class Character:
         opponent.get_damage(self.damage)
 
     def move(self, direction: Literal["forward", "left", "right"]) -> ValueError | None:
+        """ Function created to move characters
+
+        :param direction: Literal["forward", "left", "right"] - variation where to move next
+        :return: None
+
+        Move character to a new room
+        """
         ## cheks proper value was passed in param: direction
         if direction not in ["forward", "left", "right"]:
             raise ValueError("incorrect direction")
