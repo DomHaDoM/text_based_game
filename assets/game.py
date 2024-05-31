@@ -6,7 +6,7 @@ from typing import Literal
 # # Random
 # from random import randint
 
-version = "0.1"
+version = "0.1.1"
 
 class Game:
     # Initializaiton of the class

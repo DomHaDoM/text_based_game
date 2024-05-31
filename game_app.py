@@ -23,7 +23,7 @@ def main(page: Page):
     page.title = "Text Based Game"
     page.theme_mode = "dark"
     page.vertical_alignment = MainAxisAlignment.CENTER
-    app_version: str = "0.1.1"
+    app_version: str = "0.2"
 
     #variables
     game_difficulty: str = None
@@ -34,29 +34,40 @@ def main(page: Page):
     game: Game = None
 
     try:
-        player_hp: str = f"{game.player.current_health}/{game.player.max_health}"
-        player_weapon: str = f"Weapon: {game.player.weapon.name}. Damage: {game.player.damage}"
-        current_room: str = f"{game.player.current_room}"
+        player_hp_text: str = f"{game.player.current_health}/{game.player.max_health}"
+        player_weapon_text: str = f"Weapon: {game.player.weapon.name}. Damage: {game.player.damage}"
+        current_room_text: str = f"{game.player.current_room}"
     except:
-        player_hp: str = f"Fail"
-        player_weapon: str = f"Fail"
-        current_room: str = f"Fail" 
+        player_hp_text: str = f"Fail"
+        player_weapon_text: str = f"Fail"
+        current_room_text: str = f"Fail"
+    
+    player_hp = Text(player_hp_text)
+    player_weapon = Text(player_weapon_text)
+    current_room = Text(current_room_text)
 
     def add_chests(e):
         nonlocal total_chests
         total_chests += 1
+        page.update()
+
+    opened_chests_result = Text(f"Opened chests: {opened_chests}")
+    result = Text("")
 
     def open_chest_main(e):
         nonlocal total_chests, opened_chests
         if total_chests > 0:
             open_chest_btn.disabled = False
-            # chest = Chest(choice["sword", "bow", "fist"])
+            chest = Chest(item_name=str(choice(["sword", "bow", "fist"])))
             opened_chests += 1
-            total_chests += 1
-        else:
-            open_chest_btn.disabled = True
+            total_chests -= 1
+            open_chest_btn.text = f"Open chest. Aviliable: {total_chests}"
+            opened_chests_result.value = f"Opened chests: {opened_chests}"
+            result.value = f"{chest.item}"
+            if total_chests == 0:
+                open_chest_btn.disabled = True
+                result.value = "No chests left"
         page.update()
-            
 
     open_chest_btn = ElevatedButton(
         f"Open chest. Remaining: {total_chests}"
@@ -77,8 +88,8 @@ def main(page: Page):
         , Column([
             add_chest_btn
             , open_chest_btn
-            , Text(f"Avaliable chests: {total_chests}")
-            , Text(f"Opened chests: {opened_chests}")
+            , opened_chests_result
+            , result
         ])
     ], alignment=MainAxisAlignment.SPACE_EVENLY)
 
