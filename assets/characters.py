@@ -1,17 +1,21 @@
-from typing import Literal, Self
-from assets.weapons import Weapon, fists
-from assets.constants import MAP as map, STARTING_ROOM
+from typing import Literal
+from assets.weapons import Weapon
+from assets.heal_sources import Flask
+from assets.constants import MAP, STARTING_ROOM
 
 class Character:
     max_health: int = 40
-    def __init__(self, weapon: Weapon) -> None:
+    def __init__(self, weapon: Weapon = Weapon()) -> None:
         self.current_health: int = self.max_health
         self.type = "character"
         self.weapon: Weapon = weapon
         self.damage = weapon.damage
         self.current_room: str = STARTING_ROOM
+        self.previous_room: str = None
+        self.flask_charges: int = 2
 
-    def heal(self, heal_amount: int):
+
+    def heal(self):
         """ function created to heal current character
 
         :param damage: int - number of damage to deal
@@ -19,7 +23,12 @@ class Character:
         
         Updates current hp for the character
         """
-        self.current_health = min(self.current_health + heal_amount, self.max_health) # check to avoid hp going over the max barrier
+        if self.flask_charges > 0:
+            heal_amount = Flask(charges=self.flask_charges).heal()
+            self.flask_charges = Flask.charges
+            self.current_health = min(self.current_health + heal_amount, self.max_health) # check to avoid hp going over the max barrier
+        else:
+            Flask(charges=self.flask_charges).heal()
 
     def get_damage(self, damage: int) -> None:
         """ function created to get damage from characters
@@ -50,12 +59,20 @@ class Character:
         if direction not in ["forward", "left", "right"]:
             raise ValueError("incorrect direction")
         ## checks if player can go to this direction from current room
-        if direction not in map[self.current_room]:
+        if direction not in MAP[self.current_room]:
             raise ValueError("Can't go this direction from current room")
-        self.current_room = map[self.current_room][direction]
+        self.previous_room = self.current_room
+        self.current_room = MAP[self.current_room][direction]
+
+    def move_to_previous_room(self) -> None:
+        """ Function created for coming back to previous room
+        
+        Swaps values of previous and current rooms
+        """
+        self.current_room, self.previous_room = self.previous_room, self.current_room
 
 class Hero(Character):
-    def __init__(self, weapon: Weapon = fists) -> None:
+    def __init__(self, weapon: Weapon = Weapon()) -> None:
         super().__init__(weapon=weapon)
         self.type = "player"
 
@@ -65,8 +82,8 @@ class Hero(Character):
 
 
 class Enemy(Character):
-    def __init__(self, max_health: int, damage: int, weapon: Weapon):
-        super().__init__(weapon=weapon)
+    def __init__(self, max_health: int, damage: int):
+        super().__init__(damage=damage, max_health=max_health)
         self.current_health: int = max_health
         self.type = "enemy"
         self.enemy_class = "regular"

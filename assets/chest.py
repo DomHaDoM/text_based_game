@@ -1,15 +1,16 @@
-from assets.constants import RARITY_CHANCES as rc
+from assets.constants import RARITY_CHANCES, POSSIBLE_WEAPONS
 from assets.weapons import Weapon
-from random import randint, choices
+from random import choice, randint, choices
 
 class Chest:
-    def __init__(self, item_name: str) -> None:
+    def __init__(self) -> None:
         self.rarity = self.random_rarity()
-        self.item = Weapon(name=item_name, damage=5, rarity=self.rarity)
+        weapon_name = choice(POSSIBLE_WEAPONS.keys())
+        self.item = Weapon(name=weapon_name, rarity=self.random_rarity())
 
     def random_rarity(self):
         numbers: list[int] = [i for i in range(1, 100)]
-        for rarity, chance in rc.items():
+        for rarity, chance in RARITY_CHANCES.items():
             if randint(1, 100) in choices(population=numbers, k=chance):
                 return rarity
         return "common"
