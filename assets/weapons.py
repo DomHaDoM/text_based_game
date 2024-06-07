@@ -15,6 +15,8 @@ RARITY_CHANCES: dict[str, int | float] = {
     , "mythic": 3
 }
 
+RarityError = ValueError(f"'Rarity doesn't exist")
+
 class Weapon:
     _multipliers: dict[str, float] = {"common": 1.
                                       , "rare": 1.25
@@ -27,7 +29,7 @@ class Weapon:
             raise ValueError(f"'{name}' weapon type doesn't exist")
         self.name = name
         if rarity not in ["common", "rare", "epic", "mythic"]:
-            raise ValueError(f"'{rarity}' rarity doesn't exist")
+            raise RarityError
         self.rarity = rarity
         self.damage = self._possible_weapons[self.name] * Weapon._multipliers[rarity]
 

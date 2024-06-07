@@ -1,19 +1,21 @@
 from typing import Literal
-from assets.weapons import Weapon
+from assets.weapons import RARITY_CHANCES, RarityError, Weapon
 from assets.heal_sources import Flask
 from assets.constants import MAP, STARTING_ROOM
 
 class Character:
     max_health: int = 40
     def __init__(self, weapon: Weapon = Weapon()) -> None:
-        self.current_health: int = self.max_health
         self.type = "character"
-        self.weapon: Weapon = weapon
-        self.damage = weapon.damage
+        # hp
+        self.current_health: int = self.max_health
+        # weapon related
+        self.weapon= weapon
+        self.damage: float | int = weapon.damage
+        # map related
         self.current_room: str = STARTING_ROOM
         self.previous_room: str = None
         self.flask_charges: int = 2
-
 
     def heal(self):
         """ function created to heal current character
@@ -72,14 +74,44 @@ class Character:
         self.current_room, self.previous_room = self.previous_room, self.current_room
 
 class Hero(Character):
-    def __init__(self, weapon: Weapon = Weapon()) -> None:
+    def __init__(self, weapon: Weapon = Weapon(), money: int = 0) -> None:
         super().__init__(weapon=weapon)
         self.type = "player"
+        self.money = money
+
+    def equip_new_weapon(self, new_weapon: Weapon) -> None:
+        self.weapon = new_weapon
+        self.damage = self.weapon.damage
+
+    @staticmethod
+    def upgrade_costs(current_rarity: str) -> tuple[Literal[10, 15, 50, 0], Literal["common", "rare", "epic", "mythic"]]:
+        price = 0
+        new_rarity = current_rarity
+        if current_rarity not in ["common", "rare", "epic", "mythic"]:
+            raise RarityError
+        if current_rarity == "common":
+            price = 10
+            new_rarity = "rare"
+        elif current_rarity == "rare":
+            price = 15
+            new_rarity = "epic"
+        elif current_rarity == "epic":
+            price = 50
+            new_rarity = "mythic"
+        else:
+            print("Cannot upgrade anymore")
+        return price, new_rarity
+
+    def upgrade_weapon(self) -> None:
+        price, new_rarity = self.upgrade_costs(self.weapon.rarity)
+        if self.money >= price:
+            self.money -= price
+            self.weapon = Weapon(name=self.weapon.name, rarity=new_rarity)
+        else:
+            print("Don't have enough money for upgrade")
 
     def __str__(self) -> str:
         return f"Class: {self.type}\n--Current Health: {self.current_health}\n--Damage: {self.damage}"
-
-
 
 class Enemy(Character):
     def __init__(self, max_health: int, damage: int):
